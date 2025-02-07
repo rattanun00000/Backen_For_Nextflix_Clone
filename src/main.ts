@@ -9,9 +9,22 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const config = new DocumentBuilder()
-    .setTitle(API_TITLE)
-    .setDescription(API_DESCRIPTION)
-    .setVersion(API_VERSION)
+    .setTitle('Movie API Service')
+    .setDescription(`
+    Movie API Service provides access to movie information from TMDB.
+    
+    ## Features
+    - Get popular movies with pagination
+    - Multi-language support
+    - High-quality movie metadata
+    
+    ## Authentication
+    This API requires TMDB API key for authentication.
+    
+    ## Rate Limiting
+    Please note that TMDB has its own rate limiting policies.
+  `)
+    .setVersion('1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
