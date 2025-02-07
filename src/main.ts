@@ -8,34 +8,40 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const config = new DocumentBuilder()
-    .setTitle('Movie API Service')
-    .setDescription(`
-    Movie API Service provides access to movie information from TMDB.
-    
-    ## Features
-    - Get popular movies with pagination
-    - Multi-language support
-    - High-quality movie metadata
-    
-    ## Authentication
-    This API requires TMDB API key for authentication.
-    
-    ## Rate Limiting
-    Please note that TMDB has its own rate limiting policies.
-  `)
+    .setTitle('Movies API')
+    .setDescription('The Movies API description')
     .setVersion('1.0')
+    .addTag('movies')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  
+  // กำหนด CDN URLs อย่างชัดเจน
   SwaggerModule.setup('docs', app, document, {
-    explorer: true,
-    swaggerOptions: {
-      persistAuthorization: true,
-      urls: [{
-        url: './swagger-ui-init.js',
-        name: 'Default'
-      }]
-    }
+    customSiteTitle: 'Netflix Clone API Documentation',
+    customCss: '.swagger-ui .topbar { display: none }',
+    customJsStr: `
+      window.onload = function() {
+        const ui = SwaggerUIBundle({
+          url: '/docs-json',
+          dom_id: '#swagger-ui',
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+          ],
+          layout: "StandaloneLayout"
+        });
+        window.ui = ui;
+      }
+    `,
+    customfavIcon: 'https://swagger.io/favicon.png',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js'
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css'
+    ]
   });
 
   const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS');
@@ -45,6 +51,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 8000);
+  await app.listen(process.env.PORT ?? 3005);
 }
 bootstrap();
