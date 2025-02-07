@@ -2,11 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { API_DESCRIPTION, API_TITLE, API_VERSION } from './constants/swagger.constants';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+
+  app.useStaticAssets(join(__dirname, '..', 'node_modules/swagger-ui-dist'), {
+    prefix: '/docs'
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Movie API Service')
@@ -28,11 +33,16 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
+    customSiteTitle: 'Netflix Clone API Documentation',
+    customfavIcon: '/docs/favicon-32x32.png',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js'
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css'
+    ]
   });
 
   const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS');
